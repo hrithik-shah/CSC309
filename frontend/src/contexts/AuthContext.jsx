@@ -32,12 +32,13 @@ export const AuthProvider = ({ children }) => {
                 "Authorization": `Bearer ${token}`,
             },
         })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error(response.message || "Failed to fetch user data");
+        .then(async (response) => {
+            const body = await response.json();
+
+            if (!response.ok) {
+                throw new Error(body.message || "Login failed");
             }
+            return body;
         })
         .then((data) => {
             setToken(token);
@@ -81,12 +82,13 @@ export const AuthProvider = ({ children }) => {
             },
             body: JSON.stringify({ username, password }),
         })
-        .then((response) => {
-            if (response.ok) {
-                return response.json();
-            } else {
-                throw new Error(response.message || "Login failed");
+        .then(async (response) => {
+            const body = await response.json();
+
+            if (!response.ok) {
+                throw new Error(body.message || "Login failed");
             }
+            return body;
         })
         .then((data) => {
             localStorage.setItem("token", data.token);
@@ -114,14 +116,15 @@ export const AuthProvider = ({ children }) => {
                 "Content-Type": "application/json",
                 Accept: "application/json",
             },
-            body: JSON.stringify(userData),
+            body: JSON.stringify({...userData}),
         })
-        .then((response) => {
+        .then(async (response) => {
             if (response.ok) {
                 navigate("/success");
                 return "";
             } else {
-                throw new Error(response.message || "Registration failed");
+                const body = await response.json();
+                throw new Error(body.message || "Registration failed");
             }
         })
         .catch((error) => {
